@@ -51,3 +51,4 @@ public class AuthenticationController {
             throw new RuntimeException("Error executing authentication with header response!", e);
         }
     }
+}
