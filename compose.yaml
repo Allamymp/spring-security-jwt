@@ -1,0 +1,23 @@
+version: '3'
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: apiDB
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123
+    ports:
+      - "5432:5432"
+
+  api:
+    environment:
+      DB_NAME: apiDB
+      DB_USERNAME: admin
+      DB_PASSWORD: 123
+    build:
+      context: .
+      dockerfile: dockerfile
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"

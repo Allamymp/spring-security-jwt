@@ -17,7 +17,7 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping("authenticate")
+    @PostMapping("/authenticate")
     public String authenticate(Authentication authentication) {
         try {
             return authenticationService.authenticate(authentication);
@@ -27,7 +27,7 @@ public class AuthenticationController {
 
     }
 
-    @PostMapping("authenticate-cookie")
+    @PostMapping("/authenticate-cookie")
     public ResponseEntity<?> authenticateCookie(Authentication authentication, HttpServletResponse response) {
         try {
             Cookie cookie = new Cookie("token", authenticationService.authenticate(authentication));
@@ -40,7 +40,7 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping("authenticate-header")
+    @PostMapping("/authenticate-header")
     public ResponseEntity<?> authenticateHeader(Authentication authentication) {
         try {
             HttpHeaders headers = new HttpHeaders();

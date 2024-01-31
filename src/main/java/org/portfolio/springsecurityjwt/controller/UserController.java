@@ -28,7 +28,7 @@ public class UserController {
         this.encoder = encoder;
     }
 
-    @PostMapping("create")
+    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody @Validated UserCreateRecord data) {
         try {
             service.create(
@@ -45,13 +45,13 @@ public class UserController {
         }
     }
 
-    @PostMapping("{username}")
+    @PostMapping("/find=?{username}")
     public ResponseEntity<?> getUserByUsername(@PathVariable @Validated String username) {
         try {
             User user = service.getUserByUsername(username);
             return ResponseEntity.ok().body(
                     new UserResponseRecord(
-                            user.getId(),
+                            user.getId().toString(),
                             user.getUsername(),
                             user.getEmail(),
                             user.getPassword(),
@@ -65,7 +65,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("{username}-cookie")
+    @PostMapping("/find=?{username}-cookie")
     public ResponseEntity<?> getUserByUsernameCookie(@PathVariable @Validated String username, HttpServletResponse response) {
         try {
             User user = service.getUserByUsername(username);
@@ -87,12 +87,12 @@ public class UserController {
         }
     }
 
-    @PostMapping("{username}-header")
+    @PostMapping("/find=?{username}-header")
     public ResponseEntity<?> getUserByUsernameHeader(@PathVariable @Validated String username) {
         User user = service.getUserByUsername(username);
         try {
             UserResponseRecord userRecord = new UserResponseRecord(
-                    user.getId(),
+                    user.getId().toString(),
                     user.getUsername(),
                     user.getEmail(),
                     user.getPassword(),
