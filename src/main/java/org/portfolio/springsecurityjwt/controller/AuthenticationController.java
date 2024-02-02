@@ -4,15 +4,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.portfolio.springsecurityjwt.security.AuthenticationService;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 public class AuthenticationController {
@@ -28,7 +23,7 @@ public class AuthenticationController {
             System.out.println("trigged");
             return authenticationService.authenticate(authentication);
         } catch (RuntimeException e) {
-            throw new RuntimeException("Error executing authentication!", e);
+            throw new RuntimeException(e);
         }
 
     }
@@ -42,7 +37,7 @@ public class AuthenticationController {
             response.addCookie(cookie);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            throw new RuntimeException("Error executing authentication with cookie response!", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -54,17 +49,7 @@ public class AuthenticationController {
                     + authenticationService.authenticate(authentication));
             return ResponseEntity.ok().headers(headers).build();
         } catch (Exception e) {
-            throw new RuntimeException("Error executing authentication with header response!", e);
+            throw new RuntimeException(e);
         }
-    }
-    @GetMapping("/dontHaveAccess")
-    public ResponseEntity<?> dontHaveAccess(){
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","You do not have access to the desired endpoint. Please access the '/authenticate' endpoint to obtain a token."));
-    }
-    @PostMapping("/logout")
-    public ResponseEntity<?> customLogout() {
-        SecurityContextHolder.clearContext();
-
-        return ResponseEntity.ok().body(Map.of("message", "Logout successful"));
     }
 }

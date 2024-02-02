@@ -16,7 +16,3 @@ jwt:
   public:
     key: classpath:app.pub
 
-logging:
-  level:
-    org.springframework.security: DEBUG
-
