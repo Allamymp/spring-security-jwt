@@ -44,15 +44,6 @@ public class SecurityConfig {
                 .oauth2ResourceServer(
                         conf -> conf.jwt(
                                 jwt -> jwt.decoder(jwtDecoder())))
-                .exceptionHandling(
-                        custom -> custom.authenticationEntryPoint(
-                                (request, response, authException) -> response.sendRedirect("/dontHaveAccess")))
-                .logout(httpSecurityLogoutConfigurer ->
-                        httpSecurityLogoutConfigurer
-                                .logoutUrl("/logout")
-                                .logoutSuccessUrl("/authenticate")
-                                .invalidateHttpSession(true)
-                                .deleteCookies("token"))
                 .build();
 
     }
