@@ -38,12 +38,21 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/authenticate").permitAll()
                                 .requestMatchers("/create").permitAll()
-                                .requestMatchers("/h2-console").permitAll()
+                                .requestMatchers("/dontHaveAccess").permitAll()
                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .oauth2ResourceServer(
                         conf -> conf.jwt(
                                 jwt -> jwt.decoder(jwtDecoder())))
+                .exceptionHandling(
+                        custom -> custom.authenticationEntryPoint(
+                                (request, response, authException) -> response.sendRedirect("/dontHaveAccess")))
+                .logout(httpSecurityLogoutConfigurer ->
+                        httpSecurityLogoutConfigurer
+                                .logoutUrl("/logout")
+                                .logoutSuccessUrl("/authenticate")
+                                .invalidateHttpSession(true)
+                                .deleteCookies("token"))
                 .build();
 
     }

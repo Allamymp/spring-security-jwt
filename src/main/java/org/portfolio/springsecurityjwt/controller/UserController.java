@@ -13,10 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -45,8 +45,8 @@ public class UserController {
         }
     }
 
-    @PostMapping("/find=?{username}")
-    public ResponseEntity<?> getUserByUsername(@PathVariable @Validated String username) {
+    @GetMapping("/find")
+    public ResponseEntity<?> getUserByUsername(@RequestParam String username) {
         try {
             User user = service.getUserByUsername(username);
             return ResponseEntity.ok().body(
@@ -65,8 +65,8 @@ public class UserController {
         }
     }
 
-    @PostMapping("/find=?{username}-cookie")
-    public ResponseEntity<?> getUserByUsernameCookie(@PathVariable @Validated String username, HttpServletResponse response) {
+    @PostMapping("/find-cookie")
+    public ResponseEntity<?> getUserByUsernameCookie(@RequestParam String username, HttpServletResponse response) {
         try {
             User user = service.getUserByUsername(username);
             Cookie cookie = new Cookie("user",
@@ -87,8 +87,8 @@ public class UserController {
         }
     }
 
-    @PostMapping("/find=?{username}-header")
-    public ResponseEntity<?> getUserByUsernameHeader(@PathVariable @Validated String username) {
+    @PostMapping("/find-header")
+    public ResponseEntity<?> getUserByUsernameHeader(@RequestParam String username) {
         User user = service.getUserByUsername(username);
         try {
             UserResponseRecord userRecord = new UserResponseRecord(
@@ -100,10 +100,37 @@ public class UserController {
             HttpHeaders headers = new HttpHeaders();
             headers.add("user-info", userRecord.toString());
             return ResponseEntity.ok().headers(headers).build();
-        } catch (UserNotFoundException e){
+        } catch (UserNotFoundException e) {
             throw e;
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error finding user by username: " + username);
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<UserResponseRecord>> getAll() {
+
+        try {
+            List<UserResponseRecord> list = new ArrayList<>();
+            List<User> data = service.getAll();
+            if (!data.isEmpty()) {
+                for (User user : data) {
+                    list.add(new UserResponseRecord(
+                            user.toString(),
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getPassword(),
+                            user.getRole().getText())
+                    );
+                }
+                return ResponseEntity.ok().body(list);
+            } else {
+                return ResponseEntity.noContent().build();
+            }
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding all users: " + e.getMessage());
         }
     }
 }

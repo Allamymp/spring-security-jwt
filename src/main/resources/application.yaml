@@ -1,34 +1,22 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db:5432/${DB_NAME}
+    url: jdbc:postgresql://localhost:5432/apiDB
     driverClassName: org.postgresql.Driver
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: admin
+    password: 123
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
   sql:
     init:
       mode: always
       data-locations: classpath:schema.sql
-  cloud:
-    gateway:
-      routes:
-        - id: authenticate
-          uri: https://localhost:8080/
-          predicates:
-            - Path=/login
-          filters:
-            - SetPath=/authenticate
-
-        - id: authenticate-cookie
-          uri: https://localhost:8080/authenticate-cookie
-          predicates:
-            - Path=/login-cookie
-          filters:
-            - SetPath=/authenticate-cookie
 jwt:
   private:
     key: classpath:app.key
   public:
     key: classpath:app.pub
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+

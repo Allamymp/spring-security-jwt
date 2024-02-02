@@ -5,6 +5,8 @@ import org.portfolio.springsecurityjwt.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -21,5 +23,9 @@ public class UserService {
     public User getUserByUsername(String username) {
             return repository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("Client not found for username: " + username));
+    }
+
+    public List<User> getAll() {
+        return repository.findAll();
     }
 }
