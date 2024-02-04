@@ -20,7 +20,6 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public String authenticate(Authentication authentication) {
         try {
-            System.out.println("trigged");
             return authenticationService.authenticate(authentication);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);

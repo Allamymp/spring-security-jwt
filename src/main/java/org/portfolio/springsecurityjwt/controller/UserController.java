@@ -15,8 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
@@ -41,7 +41,7 @@ public class UserController {
             );
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e) {
-            throw new RuntimeException("Error creating user!");
+            throw new RuntimeException("Error creating user!", e);
         }
     }
 
@@ -51,7 +51,7 @@ public class UserController {
             User user = service.getUserByUsername(username);
             return ResponseEntity.ok().body(
                     new UserResponseRecord(
-                            user.getId().toString(),
+                            user.getId(),
                             user.getUsername(),
                             user.getEmail(),
                             user.getPassword(),
@@ -69,64 +69,69 @@ public class UserController {
     public ResponseEntity<?> getUserByUsernameCookie(@RequestParam String username, HttpServletResponse response) {
         try {
             User user = service.getUserByUsername(username);
-            Cookie cookie = new Cookie("user",
-                    user.getId() + "-"
-                            + user.getUsername() + "-"
-                            + user.getEmail() + "-"
-                            + user.getPassword() + "-"
-                            + user.getRole()
-            );
+
+            String cookieValue = String.format(
+                    "%s-%s-%s-%s-%s",
+                    user.getId()
+                    , user.getUsername()
+                    , user.getEmail()
+                    , user.getPassword()
+                    , user.getRole());
+
+            Cookie cookie = new Cookie("user", cookieValue);
             cookie.setMaxAge(3600);
             cookie.setPath("/");
             response.addCookie(cookie);
+
             return ResponseEntity.ok().build();
+
         } catch (UserNotFoundException e) {
             throw e;
         } catch (RuntimeException e) {
-            throw new RuntimeException("Error finding user by username: " + username);
+            throw new RuntimeException("Error finding user by username: " + username, e);
         }
     }
 
     @PostMapping("/find-header")
     public ResponseEntity<?> getUserByUsernameHeader(@RequestParam String username) {
-        User user = service.getUserByUsername(username);
+
         try {
+            User user = service.getUserByUsername(username);
             UserResponseRecord userRecord = new UserResponseRecord(
-                    user.getId().toString(),
+                    user.getId(),
                     user.getUsername(),
                     user.getEmail(),
                     user.getPassword(),
                     user.getRole().getText());
+
             HttpHeaders headers = new HttpHeaders();
             headers.add("user-info", userRecord.toString());
+
             return ResponseEntity.ok().headers(headers).build();
+
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Error finding user by username: " + username);
+            throw new RuntimeException("Error finding user by username: " + username, e);
         }
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<UserResponseRecord>> getAll() {
-
         try {
-            List<UserResponseRecord> list = new ArrayList<>();
-            List<User> data = service.getAll();
-            if (!data.isEmpty()) {
-                for (User user : data) {
-                    list.add(new UserResponseRecord(
-                            user.toString(),
+            List<UserResponseRecord> list = service.getAll().stream()
+                    .map(user -> new UserResponseRecord(
+                            user.getId(),
                             user.getUsername(),
                             user.getEmail(),
                             user.getPassword(),
-                            user.getRole().getText())
-                    );
-                }
-                return ResponseEntity.ok().body(list);
-            } else {
-                return ResponseEntity.noContent().build();
-            }
+                            user.getRole().getText()
+                    ))
+                    .collect(Collectors.toList());
+
+            return list.isEmpty()
+                    ? ResponseEntity.noContent().build()
+                    : ResponseEntity.ok().body(list);
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {

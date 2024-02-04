@@ -37,8 +37,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/authenticate").permitAll()
+                                .requestMatchers("/authenticate-cookie").permitAll()
+                                .requestMatchers("/authenticate-header").permitAll()
                                 .requestMatchers("/create").permitAll()
-                                .requestMatchers("/dontHaveAccess").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .oauth2ResourceServer(

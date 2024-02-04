@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/apiDB
+    url: jdbc:postgresql://db:5432/${DB_NAME}
     driverClassName: org.postgresql.Driver
-    username: admin
-    password: 123
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     show-sql: true
   sql:
